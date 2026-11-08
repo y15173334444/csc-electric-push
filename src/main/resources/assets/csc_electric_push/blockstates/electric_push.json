@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "facing=north,active=false": { "model": "csc_electric_push:block/electric_push", "y": 0 },
+    "facing=east,active=false": { "model": "csc_electric_push:block/electric_push", "y": 90 },
+    "facing=south,active=false": { "model": "csc_electric_push:block/electric_push", "y": 180 },
+    "facing=west,active=false": { "model": "csc_electric_push:block/electric_push", "y": 270 },
+    "facing=up,active=false": { "model": "csc_electric_push:block/electric_push", "x": 270 },
+    "facing=down,active=false": { "model": "csc_electric_push:block/electric_push", "x": 90 },
+    "facing=north,active=true": { "model": "csc_electric_push:block/electric_push_on", "y": 0 },
+    "facing=east,active=true": { "model": "csc_electric_push:block/electric_push_on", "y": 90 },
+    "facing=south,active=true": { "model": "csc_electric_push:block/electric_push_on", "y": 180 },
+    "facing=west,active=true": { "model": "csc_electric_push:block/electric_push_on", "y": 270 },
+    "facing=up,active=true": { "model": "csc_electric_push:block/electric_push_on", "x": 270 },
+    "facing=down,active=true": { "model": "csc_electric_push:block/electric_push_on", "x": 90 }
+  }
+}
