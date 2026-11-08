@@ -4,6 +4,7 @@ build/
 out/
 run/
 runs/
+logs/
 
 # IDE
 .idea/
@@ -13,3 +14,9 @@ runs/
 # libs/*.jar 是刻意提交的依赖基线（与主仓同规则）
 # libs/*.jar are deliberately committed dependency baselines (same rule as the main repo).
 !libs/*.jar
+
+# content-mods/：内容侧模组 jar（如 Create Aeronautics）——资产 All Rights Reserved，
+# 绝不入库；目录里的 README 入库。见 content-mods/README.md。
+# content-mods/: content-side mod jars (e.g. Create Aeronautics) - ARR assets,
+# never committed; the folder's README is. See content-mods/README.md.
+content-mods/*.jar

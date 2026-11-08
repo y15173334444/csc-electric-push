@@ -99,6 +99,16 @@ dependencies {
     compileOnly files(cscJar)
     runtimeOnly files(cscJar)
 
+    // 内容侧模组（content-mods/）：只进 dev 运行时——不编译、不进 mods.toml 依赖声明、
+    // 不入库（资产 ARR）。目录为空时自动跳过，构建不受影响。
+    // Content-side mods (content-mods/): dev runtime only - never compiled against,
+    // never declared in mods.toml, never committed (ARR assets). An empty folder
+    // simply contributes nothing, so the build is unaffected.
+    def contentModTree = fileTree(dir: 'content-mods', include: '*.jar')
+    if (!contentModTree.isEmpty()) {
+        runtimeOnly contentModTree
+    }
+
     // 测试编译同样需要这些 jar（否则 javac 无法解析被引用的类型）。
     // Tests need the same jars on the classpath or javac cannot resolve referenced types.
     testImplementation createDep
