@@ -9,9 +9,9 @@ thrust on a sub-level.
 
 ## 机制 / Mechanism
 
-- **控制面**：CSC 1.3.0 公开 API 自定义节点 `csc_electric_push:push_ratio`（「推进比例」），
-  放进蓝图机图里使用；TEXT 参数 `pos` 填电推坐标 `"x y z"`，`ratio` 输入给比例（0–1），
-  `applied` 输出钳制后的回读值。
+- **控制面**：右键电推打开自持图（CSC 方块惯例），图里放「推进比例」节点（CSC 1.3.0
+  公开 API 自定义节点）——`ratio` 输入给比例（0–1）、`applied` 输出钳制回读、TEXT 参数
+  `pos` **留空 = 写自己**；蓝图机图里的同款节点填 `pos`（`"x y z"`）即远程写。
 - **执行面**：电推 BE 实现 Sable `BlockEntitySubLevelActor`，每个物理子步在专属
   「电推推力」力组排队点力（方块中心、朝向 × 满推力 × 比例 × timeStep，帧率无关）。
 - **方块**：`FACING` 六向 = 推力方向；Create 扳手转向；潜行扳手收回保留 NBT；
