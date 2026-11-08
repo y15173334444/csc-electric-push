@@ -45,6 +45,17 @@ Design note (mechanism level): [docs/electric-push-design.md](docs/electric-push
    `ratio` → 电推 `ACTIVE` 亮起。
 3. 用 Sable 装配把电推装进子级，图内给比例，观察子级受推。
 
+## 内容侧模组 / Content-side mods
+
+`content-mods/` 放只进 dev 运行时的内容模组（现为 Create Aeronautics 捆绑包，供便携
+物理化等玩法操作）——不编译、不进 mods.toml 依赖、jar 不入库。详见
+[content-mods/README.md](content-mods/README.md)。
+
+`content-mods/` holds content-only mods for the dev runtime (currently the Create
+Aeronautics bundle, for portable physicalization play) — never compiled against,
+never declared as dependencies, jars never committed. See
+[content-mods/README.md](content-mods/README.md).
+
 ## 原型边界 / Prototype boundaries
 
 只对 Sable 子级生效；无供电模型；占位贴图；控制面仅蓝图机宿主（自定义节点现行
