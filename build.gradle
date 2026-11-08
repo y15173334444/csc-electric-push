@@ -1,0 +1,140 @@
+plugins {
+    id 'java-library'
+    id 'net.neoforged.gradle.userdev' version '7.0.181'
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+    withSourcesJar()
+}
+
+base {
+    archivesName = 'csc-electric-push'
+}
+
+group = 'io.github.y15173334444.csc_electric_push'
+// 单一真相源 = gradle.properties 的 mod_version
+// Single source of truth = gradle.properties mod_version.
+version = mod_version
+
+runs {
+    configureEach {
+        systemProperty 'forge.logging.console.level', 'info'
+        modSource sourceSets.main
+    }
+
+    client {
+        // Multiplayer dev: -Pusername=Name sets player name
+        if (project.hasProperty('username')) {
+            arguments '--username', project.property('username').toString()
+        }
+        // Auto-join: -Pquickplay=host:port passes vanilla quick-play through
+        if (project.hasProperty('quickplay')) {
+            arguments '--quickPlayMultiplayer', project.property('quickplay').toString()
+        }
+    }
+
+    server {
+        arguments '--nogui'
+    }
+}
+
+repositories {
+    mavenCentral()
+    maven { url = 'https://maven.blamejared.com' }           // Create
+    maven { url = 'https://maven.tterrag.com' }              // Registrate, Flywheel
+    maven { url = 'https://maven.moddinginquisition.org/releases' }
+    flatDir {
+        dirs 'libs'
+    }
+    // Create 走 Modrinth Maven（版权方自己的分发渠道），与主仓同款接线。
+    // Create comes from Modrinth Maven - the authors' own distribution channel,
+    // the same wiring the main repo uses.
+    exclusiveContent {
+        forRepository {
+            maven {
+                name = 'Modrinth'
+                url = 'https://api.modrinth.com/maven'
+            }
+        }
+        filter { includeGroup 'maven.modrinth' }
+    }
+}
+
+// 对主仓产出的 CSC jar 编译：兄弟目录 build/libs 产物即来源（与 tools/example-addon
+// 同款存在性检查）。缺 jar 时先在主仓 ./gradlew jar。
+// Compile against the CSC jar the main repo builds (the sibling build/libs output, with
+// the same existence check as tools/example-addon). If it is missing, run
+// ../../create-schematic-compute/gradlew jar in the main repo first.
+def cscJar = file("../create-schematic-compute/build/libs/create-schematic-compute-${csc_version}.jar")
+if (!cscJar.exists()) {
+    throw new GradleException(
+        "Create: Schematic Compute jar not found: ${cscJar}\n" +
+        "Build the main repo first:  ../create-schematic-compute/gradlew jar")
+}
+
+dependencies {
+    implementation "net.neoforged:neoforge:${neo_version}"
+
+    // Create 走 Modrinth Maven。Modrinth 生成的 POM 不含 <dependencies>，所以
+    // Flywheel / Ponder 必须继续由 libs/ 提供，编译期才看得到其 API。
+    // Create comes from Modrinth Maven. Its generated POM declares no dependencies,
+    // so Flywheel / Ponder must keep coming from libs/ for the compile classpath.
+    def createDep = "maven.modrinth:create:${create_maven_version}"
+    compileOnly createDep
+    runtimeOnly createDep
+
+    // 本地 JAR 依赖（Flywheel / Ponder / Sable 等）：javac 看不见 Sable jarjar 嵌套的
+    // companion，故 companion 以独立 jar 同袋。
+    // Local JARs (Flywheel / Ponder / Sable, ...): javac cannot see Sable's jarjar-nested
+    // companion, so the companion rides along as its own jar in the same tree.
+    def localJarTree = fileTree(dir: 'libs', include: '*.jar')
+    compileOnly localJarTree
+    runtimeOnly localJarTree
+
+    // CSC 本体（编译期契约面 + 开发运行期模组本体）。
+    // The CSC body itself (the compile-time contract surface + the dev runtime mod).
+    compileOnly files(cscJar)
+    runtimeOnly files(cscJar)
+
+    // 测试编译同样需要这些 jar（否则 javac 无法解析被引用的类型）。
+    // Tests need the same jars on the classpath or javac cannot resolve referenced types.
+    testImplementation createDep
+    testImplementation localJarTree
+    testImplementation files(cscJar)
+
+    // Unit tests
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.11.4'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.11.4'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+tasks.withType(ProcessResources).configureEach {
+    var replaceProperties = [
+            minecraft_version       : minecraft_version,
+            minecraft_version_range : minecraft_version_range,
+            neo_version             : neo_version,
+            neo_version_range       : neo_version_range,
+            loader_version_range    : loader_version_range,
+            mod_id                  : mod_id,
+            mod_name                : mod_name,
+            mod_license             : mod_license,
+            mod_version             : mod_version,
+            mod_authors             : mod_authors,
+            mod_description         : mod_description,
+            csc_version_range       : csc_version_range,
+            create_version_range    : create_version_range,
+            sable_version_range     : sable_version_range,
+    ]
+    inputs.properties replaceProperties
+
+    filesMatching(['META-INF/neoforge.mods.toml']) {
+        expand replaceProperties
+    }
+}

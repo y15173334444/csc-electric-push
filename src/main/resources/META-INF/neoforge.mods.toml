@@ -1,0 +1,53 @@
+modLoader = "javafml"
+loaderVersion = "${loader_version_range}"
+license = "${mod_license}"
+
+[[mods]]
+modId = "${mod_id}"
+version = "${mod_version}"
+displayName = "${mod_name}"
+authors = "${mod_authors}"
+description = '''
+${mod_description}
+'''
+
+    [[mods.dependencies]]
+    modId = "minecraft"
+    versionRange = "${minecraft_version_range}"
+    ordering = "NONE"
+    side = "BOTH"
+    mandatory = true
+
+    [[mods.dependencies]]
+    modId = "neoforge"
+    versionRange = "${neo_version_range}"
+    ordering = "NONE"
+    side = "BOTH"
+    mandatory = true
+
+    [[mods.dependencies]]
+    modId = "create_schematic_compute"
+    # 1.3.0 API 实验期至 1.4.0 冻结（签名与语义可变），区间上限卡在 1.4。
+    # The API is experimental until the 1.4.0 freeze (signatures and semantics may change),
+    # so the range stops below 1.4.
+    versionRange = "${csc_version_range}"
+    ordering = "AFTER"
+    side = "BOTH"
+    mandatory = true
+
+    [[mods.dependencies]]
+    modId = "create"
+    versionRange = "${create_version_range}"
+    ordering = "NONE"
+    side = "BOTH"
+    mandatory = true
+
+    [[mods.dependencies]]
+    modId = "sable"
+    # 下限 1.2.2（plot 网格改中心+本地坐标框架后才成形），上限卡 2.1。
+    # Floor 1.2.2 (the plot grid only settled into its centre+local frame at 1.2.2);
+    # the top is capped below 2.1.
+    versionRange = "${sable_version_range}"
+    ordering = "NONE"
+    side = "BOTH"
+    mandatory = true

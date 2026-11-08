@@ -1,0 +1,15 @@
+# Gradle / 构建产物
+.gradle/
+build/
+out/
+run/
+runs/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# libs/*.jar 是刻意提交的依赖基线（与主仓同规则）
+# libs/*.jar are deliberately committed dependency baselines (same rule as the main repo).
+!libs/*.jar
