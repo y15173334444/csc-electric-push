@@ -47,8 +47,8 @@ Design note (mechanism level): [docs/electric-push-design.md](docs/electric-push
 
 ## 内容侧模组 / Content-side mods
 
-`content-mods/` 放只进 dev 运行时的内容模组（现为 Create Aeronautics 捆绑包，供便携
-物理化等玩法操作）——不编译、不进 mods.toml 依赖、jar 不入库。详见
+`content-mods/` 放只进 dev 运行时的内容模组（现为 Create Aeronautics 捆绑包——内容
+素材；物理化本体是 Sable）——不编译、不进 mods.toml 依赖、jar 不入库。详见
 [content-mods/README.md](content-mods/README.md)。
 
 `content-mods/` holds content-only mods for the dev runtime (currently the Create

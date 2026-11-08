@@ -4,6 +4,13 @@
 **不是依赖**——不参与编译、不写进 `neoforge.mods.toml` 的依赖声明、也不入库。
 `build.gradle` 把本目录的 `*.jar` 以 `runtimeOnly` 挂进运行时；目录为空时自动跳过。
 
+**口径**：物理化本体是 Sable（sub-level 体系，电推推的也是 Sable 子级）；本目录的
+模组只是**内容素材**，不承担物理化机制。
+
+**Stance**: Sable is the physicalization core (the sub-level system — the electric push
+pushes Sable sub-levels); the mods in this directory are **content material** and carry
+no physicalization machinery.
+
 This directory holds **content-side** mod jars: they enter the dev runtime only
 (available in `runClient`/`runServer`) and are **not dependencies** — never compiled
 against, never declared in `neoforge.mods.toml`, never committed. `build.gradle` wires
@@ -18,7 +25,7 @@ every `*.jar` here in as `runtimeOnly`; an empty folder contributes nothing.
 
 | jar | 模组 / Mod | 版本 / Version | 说明 / Notes |
 | --- | --- | --- | --- |
-| `create-aeronautics-bundled-1.21.1-1.2.1.jar` | **Create Aeronautics**（捆绑 Simulated + Aeronautics + Offroad 三件） | 1.2.1 | 2026-11-08 从主仓 git 历史恢复（2026-09-12 移出 `libs/` 前的那份）；供便携物理化等玩法操作 |
+| `create-aeronautics-bundled-1.21.1-1.2.1.jar` | **Create Aeronautics**（捆绑 Simulated + Aeronautics + Offroad 三件） | 1.2.1 | 2026-11-08 从主仓 git 历史恢复（2026-09-12 移出 `libs/` 前的那份）；内容素材 |
 
 捆绑件的运行时依赖已核齐：`create [6.0.10,)`、`sable [1.2.1,)`、`flywheel [1.0.6,)`
 由本工程 `libs/` 与 Modrinth 接线提供，`simulated` 内嵌于捆绑 jar 自带。本工程与
