@@ -42,17 +42,22 @@ roster at construction, which admits them into the CUSTOM category of blueprint 
 
 - 电推 BE 实现 Sable 的 `BlockEntitySubLevelActor`：放进子级即被 Sable 自动收纳，
   无需显式注册。
-- 每个物理子步在 `sable$physicsTick` 排队一个点力：`PROPULSION` 力组、作用点为方块
-  中心（绘图本地坐标）、力矢量为 `朝向 × MAX_THRUST × 推进比例 × timeStep`。
-  乘 `timeStep` 使每游戏刻的总冲量与子步数无关（与 Sable 自带螺旋桨同款节拍）。
+- 每个物理子步在 `sable$physicsTick` 排队一个点力：专属力组「电推推力」（自建
+  `ForceGroup` 实例——Sable 内置力组常量是 Veil 的 `RegistryObject` 类型，不在 javac
+  可见面，而 `ForceGroup` 本体是纯 record）、作用点为方块中心（绘图本地坐标）、
+  力矢量为 `朝向 × MAX_THRUST × 推进比例 × timeStep`。乘 `timeStep` 使每游戏刻的
+  总冲量与子步数无关（与 Sable 自带螺旋桨同款节拍）。
 - 子步开始时力组清零、子步末统一结算冲量，休眠体会被力唤醒。
 
 The BE implements Sable's `BlockEntitySubLevelActor` — Sable collects it automatically once
 the block lives inside a sub-level, with no registration call. Each physics substep queues a
-point force in `sable$physicsTick`: the `PROPULSION` force group, applied at the block's
-centre (plot-local coordinates), with the vector `facing × MAX_THRUST × ratio × timeStep`.
-Multiplying by `timeStep` keeps the per-game-tick impulse independent of the substep count
-(the exact cadence of Sable's own propeller). Force groups reset at substep start and settle
+point force in `sable$physicsTick`: the actuator's own "electric push thrust" force group
+(a local `ForceGroup` instance — Sable's built-in group constants are Veil's
+`RegistryObject` type, outside javac's reach, while the `ForceGroup` record itself is
+pure), applied at the block's centre (plot-local coordinates), with the vector
+`facing × MAX_THRUST × ratio × timeStep`. Multiplying by `timeStep` keeps the
+per-game-tick impulse independent of the substep count (the exact cadence of Sable's own
+propeller). Force groups reset at substep start and settle
 into one impulse at substep end; sleeping bodies wake when the total changes.
 
 ### 2.3 方块行为 / Block behaviour
