@@ -43,4 +43,23 @@ class NodeInputsTest {
         assertEquals(0f, NodeInputs.clampRatio(Float.POSITIVE_INFINITY));
         assertEquals(0f, NodeInputs.clampRatio(Float.NEGATIVE_INFINITY));
     }
+
+    @Test
+    void resolveTarget_blank_pos_targets_the_host() {
+        BlockPos host = new BlockPos(10, 20, 30);
+        assertEquals(host, NodeInputs.resolveTarget(null, host));
+        assertEquals(host, NodeInputs.resolveTarget("", host));
+        assertEquals(host, NodeInputs.resolveTarget("   ", host));
+    }
+
+    @Test
+    void resolveTarget_parses_address_and_stays_fail_closed_on_garbage() {
+        BlockPos host = new BlockPos(10, 20, 30);
+        assertEquals(new BlockPos(1, 2, 3), NodeInputs.resolveTarget("1 2 3", host));
+        assertEquals(new BlockPos(-4, 5, 6), NodeInputs.resolveTarget("-4,5,6", host));
+        // 垃圾文本不是「留空」：仍 fail-closed，不落到宿主。
+        // Garbage text is not "left blank": still fail-closed, never the host.
+        assertNull(NodeInputs.resolveTarget("garbage", host));
+        assertNull(NodeInputs.resolveTarget("1 2", host));
+    }
 }

@@ -29,6 +29,16 @@ public final class NodeInputs {
         }
     }
 
+    /** 寻址决议：{@code pos} 为空 → 宿主自己（自持图用法）；填了就解析（远程直连用法）；
+     *  畸形输入仍然 fail-closed → null（不落到宿主——垃圾文本不是「留空」）。
+     *  Addressing ruling: a blank {@code pos} targets the host itself (self-hosted-graph
+     *  usage); a filled one is parsed (remote-direct usage); malformed input still fails
+     *  closed to null (garbage text is not "left blank"). */
+    public static BlockPos resolveTarget(String posText, BlockPos hostPos) {
+        if (posText == null || posText.isBlank()) return hostPos;
+        return parsePos(posText);
+    }
+
     /** 推进比例钳制到 [0,1]；NaN/无穷 → 0。Clamps the push ratio to [0,1]; NaN/infinity → 0. */
     public static float clampRatio(float raw) {
         if (!Float.isFinite(raw)) return 0f;

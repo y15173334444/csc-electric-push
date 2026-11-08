@@ -1,5 +1,6 @@
 {
   "block.csc_electric_push.electric_push": "Electric Push",
   "itemGroup.csc_electric_push": "CSC: Electric Push",
+  "container.csc_electric_push.electric_push": "Electric Push",
   "force.csc_electric_push.thrust": "Electric Push Thrust"
 }

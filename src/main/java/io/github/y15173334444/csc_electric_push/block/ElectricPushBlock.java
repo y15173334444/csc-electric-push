@@ -16,10 +16,13 @@ import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -68,6 +71,33 @@ public class ElectricPushBlock extends BaseEntityBlock implements IWrenchable {
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new ElectricPushBlockEntity(pos, state);
+    }
+
+    @Nullable
+    @Override
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level l, BlockState s, BlockEntityType<T> t) {
+        if (l.isClientSide()) return null;
+        return createTickerHelper(t, io.github.y15173334444.csc_electric_push.ElectricPush.ELECTRIC_PUSH_BE.get(),
+            (lv, p, st, be) -> be.tick());
+    }
+
+    /** 右键开图（CSC 方块惯例）：仅客户端直接打开图编辑器（无 Menu 网络 round-trip）。
+     *  Right-click opens the graph (the CSC block convention): client-side only, the
+     *  editor opens directly (no menu round-trip). */
+    @Override
+    protected InteractionResult useWithoutItem(BlockState s, Level l, BlockPos p, Player pl, BlockHitResult h) {
+        if (l.isClientSide()) {
+            if (l.getBlockEntity(p) instanceof ElectricPushBlockEntity) openScreen(p);
+            return InteractionResult.SUCCESS;
+        }
+        return InteractionResult.CONSUME;
+    }
+
+    /** 客户端打开图编辑器（@OnlyIn 由 dist cleaner 在专用服务端剥离）。
+     *  Client-only screen opener (@OnlyIn stripped by the dist cleaner on servers). */
+    @net.neoforged.api.distmarker.OnlyIn(net.neoforged.api.distmarker.Dist.CLIENT)
+    private static void openScreen(BlockPos p) {
+        net.minecraft.client.Minecraft.getInstance().setScreen(new ElectricPushScreen(p));
     }
 
     @Override
