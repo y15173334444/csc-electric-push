@@ -67,9 +67,13 @@ public final class ElectricPush {
         // ① Register the custom node "push ratio": schema + behavior in one call.
         CustomNodes.register(ElectricPushNodes.pushRatioSchema(), ElectricPushNodes.pushRatioBehavior());
 
-        // ② 名单制登记：注册 ≠ 准入 —— id 显式登记进蓝图机的准入名单。
-        // ② Roster enrolment: registering ≠ admitting - enrol the id into the
-        // blueprint host's roster explicitly.
+        // ② 名单制登记：注册 ≠ 准入 —— id 显式登记进蓝图机的准入名单（CSC 白名单键，
+        // 归属两路放行的第①路；自持图名单在 BE 构造期随 bind 走自声明键，见
+        // ElectricPushBlockEntity）。
+        // ② Roster enrolment: registering ≠ admitting - enrol the id into the blueprint
+        // host's roster explicitly (a CSC allowlist key, path 1 of the two-path
+        // ownership; the self-graph roster rides the self-declared key at BE
+        // construction with bind - see ElectricPushBlockEntity).
         CustomNodes.admitToHost(ElectricPushNodes.NODE_ID, CustomNodes.HOST_BLUEPRINT);
     }
 }

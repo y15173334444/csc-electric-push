@@ -9,15 +9,20 @@ import dev.ryanhcode.sable.sublevel.ServerSubLevel;
 import io.github.y15173334444.csc_electric_push.ElectricPush;
 import io.github.y15173334444.csc_electric_push.node.ElectricPushNodes;
 import io.github.y15173334444.csc_electric_push.node.NodeInputs;
-import io.github.y15173334444.create_schematic_compute.blocks.GraphHost;
-import io.github.y15173334444.create_schematic_compute.blocks.SyncedGraphBlockEntity;
-import io.github.y15173334444.create_schematic_compute.graph.NodeAllowance;
+import io.github.y15173334444.create_schematic_compute.api.CustomNodes;
+import io.github.y15173334444.create_schematic_compute.api.HostGraphBehavior;
+import io.github.y15173334444.create_schematic_compute.api.HostGraphHandle;
+import io.github.y15173334444.create_schematic_compute.api.HostGraphs;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3d;
@@ -32,8 +37,9 @@ import org.joml.Vector3d;
  *       「电推推力」、作用点=方块中心（绘图本地坐标）、矢量=
  *       {@code 朝向 × MAX_THRUST × 比例 × timeStep}（帧率无关，Sable 螺旋桨同款节拍）。</li>
  * </ul>
- * 图宿主基类走 CSC 内部面（{@code SyncedGraphBlockEntity}/{@code GraphHost}，公开
- * 宿主套件波 2 落地后迁移）。
+ * 图宿主走公开宿主套件（波 2，已迁移）：构造期 {@code HostGraphs.bind} 拿引擎柄，
+ * tick/生命周期/NBT 各一行转发 —— 图域对象不经本类之手；右键开图走
+ * {@code HostGraphs.openEditor} 泛用屏。
  * <p>The electric push BE: a CSC graph host and a Sable sub-level thruster in one.
  * Control plane: its own node graph (right-click to open, the SpeedProxy-style L-variant
  * host skeleton), driven by the "push ratio" custom node ({@code pos} blank = write the
@@ -41,12 +47,13 @@ import org.joml.Vector3d;
  * Execution plane: {@link BlockEntitySubLevelActor} queues a point force per physics
  * substep - the actuator's own "electric push thrust" force group, applied at the block
  * centre (plot-local), {@code facing × MAX_THRUST × ratio × timeStep} (frame-rate
- * independent, the cadence of Sable's own propeller). The host base classes are CSC
- * internal surface ({@code SyncedGraphBlockEntity}/{@code GraphHost}); migrate once the
- * public host suite (wave 2) lands.</p>
+ * independent, the cadence of Sable's own propeller). The host rides the public host
+ * suite (wave 2, migrated): the engine handle comes from {@code HostGraphs.bind} at
+ * construction, tick/lifecycle/NBT forward one line each, and the editor opens through
+ * {@code HostGraphs.openEditor}'s generic screen.</p>
  */
-public class ElectricPushBlockEntity extends SyncedGraphBlockEntity
-    implements GraphHost.TickHooks, BlockEntitySubLevelActor {
+public class ElectricPushBlockEntity extends BlockEntity
+    implements BlockEntitySubLevelActor {
 
     /** 满比例推力（牛顿）：原型常量，可调。Full-ratio thrust in newtons: a tunable prototype constant. */
     public static final double MAX_THRUST = 25.0;
@@ -63,33 +70,35 @@ public class ElectricPushBlockEntity extends SyncedGraphBlockEntity
 
     private float pushRatio = 0f;
 
+    /** 宿主套件引擎柄：bind 即键声明（幂等，键属宿主类型）；实例专属状态住 CSC 侧
+     * 适配器登记表（按 BE 实例分键）。tick/生命周期/NBT 各一行转发进柄。
+     * The suite engine handle: bind declares the key (idempotent - keys belong to the
+     * host type); per-instance state lives in CSC's adapter registry keyed by BE
+     * instance. tick/lifecycle/NBT forward one line each into the handle. */
+    private final HostGraphHandle graph;
+
+    @SuppressWarnings("unchecked")
     public ElectricPushBlockEntity(BlockPos pos, BlockState state) {
-        super(ElectricPush.ELECTRIC_PUSH_BE.get(), pos, state);
+        super((BlockEntityType<? extends BlockEntity>) ElectricPush.ELECTRIC_PUSH_BE.get(), pos, state);
+        // bind 即键声明（幂等）；缝面空实现——偏差全部化进 HOST_SPEC 声明（L 档 +
+        // 停机位），本宿主不占任何缝。
+        // bind means declare (idempotent); an empty seam face - the deviations all ride
+        // HOST_SPEC's declarations (the Light tier + the stop slot), this host uses no
+        // seam.
+        this.graph = HostGraphs.bind(this, ElectricPushNodes.HOST_SPEC, new HostGraphBehavior() {});
+        // 自持图名单：自声明键 + 同命名空间节点（归属两路放行的第②路）。
+        // The self-graph roster: the self-declared key + same-namespace node (path 2 of
+        // the two-path ownership).
+        CustomNodes.admitToHost(ElectricPushNodes.NODE_ID, ElectricPushNodes.HOST_KEY);
     }
 
-    // ── 图宿主（SpeedProxy 同款 L 档）/ graph host (the SpeedProxy L variant) ──
+    // ── 图宿主（套件柄转发，SpeedProxy 同款 L 档）/ graph host (suite-handle forwards) ──
 
-    /** tick 体收敛进 GraphHost.tickBody（K23 骨架）。
-     *  The tick body converges into GraphHost.tickBody (the K23 skeleton). */
+    /** tick 体经柄进引擎（K23 骨架）。 The tick body rides the handle into the engine
+     *  (the K23 skeleton). */
     public void tick() {
-        tickBody(this);
+        graph.tick();
     }
-
-    /** ④ L 档轻量重编译（Monitor/KineticGauge/SpeedProxy 同款）。 / Step ④ light recompile. */
-    @Override public boolean lightRecompile() { return true; }
-
-    /** ⑤ 停机检查介于 ③ 后——停机也让链路注册跟随图 generation（P2-18 同款口径）。
-     *  Step ⑤ stop check after ③ - link registration tracks graph generation even
-     *  while stopped (the P2-18 stance). */
-    @Override public GraphHost.StopSlot stopSlot() { return GraphHost.StopSlot.AFTER_GRAPH_CHECK; }
-
-    /** ⑨ 基础档（3 参）。 / Step ⑨ basic (3-arg) form. */
-    @Override public GraphHost.EvalVariant evalVariant() { return GraphHost.EvalVariant.BASIC; }
-
-    /** P2-7 服务端准入门：本宿主答自己的名单（与 ElectricPushScreen 的客户端过滤同源）。
-     *  P2-7 server admission gate: this host answers its own allowlist (the same source
-     *  as ElectricPushScreen's client-side filtering). */
-    @Override public NodeAllowance nodeAllowance() { return ElectricPushNodes.ALLOWANCE; }
 
     // 比例不走缝 8：图里的「推进比例」自定义节点在求值回调内提供方直连写入
     // setPushRatio（自持图 pos 留空=写本宿主，远程图按 pos 寻址），宿主无需读图输出。
@@ -138,15 +147,61 @@ public class ElectricPushBlockEntity extends SyncedGraphBlockEntity
         forceGroup.applyAndRecordPointForce(JOMLConversion.atCenterOf(worldPosition), impulse);
     }
 
+    // ── 图 NBT/同步管线（柄转发；SyncedGraphBlockEntity 迁出后本类自管原版链）──
+    //     Graph NBT/sync pipeline (handle forwards; after leaving SyncedGraphBlockEntity
+    //     this class owns its vanilla chain).
+
+    @Override
+    public void onLoad() {
+        super.onLoad();
+        graph.onHostLoad();
+    }
+
+    @Override
+    public void onChunkUnloaded() {
+        graph.onHostChunkUnloaded();
+        super.onChunkUnloaded();
+    }
+
+    @Override
+    public void setRemoved() {
+        graph.onHostRemoved();
+        super.setRemoved();
+    }
+
+    /** getUpdateTag = 全图随包（SyncedGraphBlockEntity 口径；柄内门控按 clientPacket
+     *  收口，本路径恒 false）。/ The update tag ships the full graph (the
+     *  SyncedGraphBlockEntity stance; the handle's gate keys on clientPacket, always
+     *  false on this path). */
+    @Override
+    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
+        CompoundTag tag = super.getUpdateTag(registries);
+        graph.save(tag, registries, false);
+        return tag;
+    }
+
+    @Override
+    public Packet<ClientGamePacketListener> getUpdatePacket() {
+        return net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket.create(this);
+    }
+
+    @Override
+    public void handleUpdateTag(CompoundTag tag, HolderLookup.Provider registries) {
+        super.handleUpdateTag(tag, registries);
+        graph.load(tag, registries);
+    }
+
     @Override
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
+        graph.save(tag, registries, false);
         tag.putFloat("PushRatio", pushRatio);
     }
 
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
+        graph.load(tag, registries);
         pushRatio = NodeInputs.clampRatio(tag.getFloat("PushRatio"));
     }
 }

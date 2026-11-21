@@ -27,8 +27,11 @@ ${mod_description}
 
     [[mods.dependencies]]
     modId = "create_schematic_compute"
-    # 1.3.0 API 实验期至 1.4.0 冻结（签名与语义可变），区间上限卡在 1.4。
-    # The API is experimental until the 1.4.0 freeze (signatures and semantics may change),
+    # 1.3.0 API 实验期（签名与语义可变）；冻结点 = API 版本 1.0.0（D9：API 版本独立于
+    # 模组版本，首次破坏性变更即 1.0.0）。本区间上限卡在模组 1.4 只是发行节奏选择。
+    # The API is experimental (signatures and semantics may change); the freeze point is
+    # API version 1.0.0 (D9: the API version is independent of the mod version, the first
+    # breaking change bumps it there). The cap below mod 1.4 is a release-cadence choice.
     # so the range stops below 1.4.
     versionRange = "${csc_version_range}"
     ordering = "AFTER"

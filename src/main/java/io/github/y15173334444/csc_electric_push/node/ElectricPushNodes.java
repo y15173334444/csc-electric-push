@@ -4,13 +4,12 @@ import io.github.y15173334444.csc_electric_push.block.ElectricPushBlockEntity;
 import io.github.y15173334444.create_schematic_compute.api.CustomNodeBehavior;
 import io.github.y15173334444.create_schematic_compute.api.CustomNodeResult;
 import io.github.y15173334444.create_schematic_compute.api.CustomNodeType;
-import io.github.y15173334444.create_schematic_compute.graph.BlockNodeAllowances;
-import io.github.y15173334444.create_schematic_compute.graph.NodeAllowance;
-import io.github.y15173334444.create_schematic_compute.graph.NodeCategory;
+import io.github.y15173334444.create_schematic_compute.api.HostAdmission;
+import io.github.y15173334444.create_schematic_compute.api.HostCategory;
+import io.github.y15173334444.create_schematic_compute.api.HostGraphType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 
-import java.util.EnumSet;
 import java.util.List;
 
 /**
@@ -33,24 +32,28 @@ public final class ElectricPushNodes {
      *  The node id: persisted in the graph NBT (cid) - renaming breaks saves, keep it. */
     public static final String NODE_ID = "csc_electric_push:push_ratio";
 
-    /** 电推自持图的节点名单。过渡口径（可否决）：名单键借用蓝图机的
-     * {@code hostKey}——键在 CSC 里只是名单命名空间（客户端菜单过滤 + 服务端准入门
-     * 两处消费，不进存档 NBT），而第三方宿主键今天还登记不进名单（登记口只放行蓝图机，
-     * 波 2 宿主套件才让宿主自声明可登记键）。借用后本节点（已登记进蓝图机名单）在
-     * 电推图里同名单可见；波 2 声明口落地后换回正式键即可。
-     * The electric push's own-graph node roster. Transitional stance (vetoable): the
-     * roster key borrows the blueprint computer's {@code hostKey} - the key is only a
-     * roster namespace in CSC (client menu filter + server admission gate; never saved
-     * to NBT), and third-party host keys cannot yet enrol into any roster (the enrolment
-     * point only admits the blueprint key; the wave-2 host suite lets hosts declare
-     * enrolable keys). The borrowed key makes this node (already on the blueprint
-     * roster) visible in the electric push's graph from the same roster; swap to a
-     * proper key once the wave-2 declaration point lands. */
-    public static final NodeAllowance ALLOWANCE = NodeAllowance.of(
-        BlockNodeAllowances.BLUEPRINT.hostKey(),
-        EnumSet.of(NodeCategory.VALUES, NodeCategory.MATH_BASIC, NodeCategory.MATH_ADVANCED,
-            NodeCategory.TRIG, NodeCategory.LOGIC, NodeCategory.CONTROL,
-            NodeCategory.CUSTOM, NodeCategory.DEBUG));
+    /** 宿主键（波 2 套件）：自声明键，命名空间 = 本模组 id —— {@code HostGraphs.bind}
+     * 即声明，{@code CustomNodes.admitToHost} 归属两路放行的「自声明键同命名空间」路。
+     * The host key (wave-2 suite): self-declared, namespace = this mod's id -
+     * {@code HostGraphs.bind} declares it, and it rides the "self-declared key, same
+     * namespace" path of {@code CustomNodes.admitToHost} ownership. */
+    public static final String HOST_KEY = "csc_electric_push:electric_push";
+
+    /** 电推自持图的声明面（波 2 套件）：准入偏好沿用原名单类目集（api
+     * {@link HostCategory} 与内部类目一一对应）；tick 编排偏差 = SpeedProxy 同款
+     * L 档 + 停机检查介于图检查后。
+     * The self-graph declaration face (wave-2 suite): the admission preference keeps
+     * the original category set (api {@link HostCategory} mirrors the internals
+     * one-to-one); tick deviations = the SpeedProxy-style Light tier + the stop check
+     * after the graph check. */
+    public static final HostGraphType HOST_SPEC = HostGraphType.of(
+        HOST_KEY,
+        HostAdmission.of(HostCategory.VALUES, HostCategory.MATH_BASIC, HostCategory.MATH_ADVANCED,
+            HostCategory.TRIG, HostCategory.LOGIC, HostCategory.CONTROL,
+            HostCategory.CUSTOM, HostCategory.DEBUG),
+        HostGraphType.EvalVariant.BASIC)
+        .withLightRecompile()
+        .withStopSlot(HostGraphType.StopSlot.AFTER_GRAPH_CHECK);
 
     private ElectricPushNodes() {}
 

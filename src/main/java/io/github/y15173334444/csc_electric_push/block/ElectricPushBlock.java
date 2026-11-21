@@ -93,11 +93,14 @@ public class ElectricPushBlock extends BaseEntityBlock implements IWrenchable {
         return InteractionResult.CONSUME;
     }
 
-    /** 客户端打开图编辑器（@OnlyIn 由 dist cleaner 在专用服务端剥离）。
-     *  Client-only screen opener (@OnlyIn stripped by the dist cleaner on servers). */
+    /** 客户端打开图编辑器（波 2 套件一行口：泛用屏经 client-only 钩子打开；
+     *  @OnlyIn 保留原形态，dist cleaner 在专用服务端剥离）。
+     *  Client-side open (the wave-2 suite one-liner: the generic screen opens through
+     *  the client-only hook; @OnlyIn keeps the original shape, stripped by the dist
+     *  cleaner on servers). */
     @net.neoforged.api.distmarker.OnlyIn(net.neoforged.api.distmarker.Dist.CLIENT)
     private static void openScreen(BlockPos p) {
-        net.minecraft.client.Minecraft.getInstance().setScreen(new ElectricPushScreen(p));
+        io.github.y15173334444.create_schematic_compute.api.HostGraphs.openEditor(p);
     }
 
     @Override
