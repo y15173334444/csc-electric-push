@@ -28,9 +28,10 @@ Design note (mechanism level): [docs/electric-push-design.md](docs/electric-push
 
 ## 依赖 / Dependencies
 
-全部强制 / all mandatory: `create_schematic_compute` `[1.3.0, 1.4)`、`create` `[6.0.10,)`、
-`sable` `[1.2.2, 2.1)`。编译接线复用主仓形态：Create 走 Modrinth Maven，Sable 用
-`libs/` 四件套，CSC 按兄弟目录 `build/libs` 产物编译。
+全部强制 / all mandatory: `create_schematic_compute` `[1.3.0,)`（模组区间只表达最低发行线；
+API 兼容性按 `ApiVersion` 判别——本附属用宿主套件面 = API 0.2.0，init 期守门）、
+`create` `[6.0.10,)`、`sable` `[1.2.2, 2.1)`。编译接线复用主仓形态：Create 走 Modrinth Maven，
+Sable 用 `libs/` 四件套，CSC 按兄弟目录 `build/libs` 产物编译。
 
 ## 构建与运行 / Build & run
 

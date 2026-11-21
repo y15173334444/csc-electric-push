@@ -100,8 +100,9 @@ thrust and speed-servo semantics are explicitly out of the prototype.
 
 ## 4. 依赖边界 / Dependency boundary
 
-- 三强制（mods.toml 全部 mandatory）：`create_schematic_compute` `[1.3.0, 1.4)`（API
-  实验期至 1.4.0 冻结，上限卡 1.4）、`create` `[6.0.10,)`、`sable` `[1.2.2, 2.1)`。
+- 三强制（mods.toml 全部 mandatory）：`create_schematic_compute` `[1.3.0,)`（模组区间只表
+  达最低发行线；API 兼容性按 `ApiVersion` 判别——本附属用宿主套件面，需 API ≥ 0.2.0，
+  init 期守门）、`create` `[6.0.10,)`、`sable` `[1.2.2, 2.1)`。
 - 编译接线复用 CSC 现成验证过的形态：Create 走 Modrinth Maven；Sable 用 `libs/` 四件套
   （javac 看不见 jarjar 嵌套 jar，故 Flywheel/Ponder 同袋）；CSC 本体按兄弟目录
   `build/libs` 产物编译（缺 jar 时构建期报错并提示先构建主仓）。

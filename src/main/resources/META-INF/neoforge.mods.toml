@@ -27,12 +27,11 @@ ${mod_description}
 
     [[mods.dependencies]]
     modId = "create_schematic_compute"
-    # 1.3.0 API 实验期（签名与语义可变）；冻结点 = API 版本 1.0.0（D9：API 版本独立于
-    # 模组版本，首次破坏性变更即 1.0.0）。本区间上限卡在模组 1.4 只是发行节奏选择。
-    # The API is experimental (signatures and semantics may change); the freeze point is
-    # API version 1.0.0 (D9: the API version is independent of the mod version, the first
-    # breaking change bumps it there). The cap below mod 1.4 is a release-cadence choice.
-    # so the range stops below 1.4.
+    # 兼容性按 API 自己的版本号判别（api 包 ApiVersion.CURRENT，与模组版本解耦）：本附属
+    # 使用宿主套件面（API 0.2.0）并在 init 期守门；模组区间只表达最低发行线，不推断 API 兼容性。
+    # Compatibility is indexed by the API's own version (api.ApiVersion.CURRENT, decoupled
+    # from the mod version): the addon uses the host-suite surface (API 0.2.0) and gates in
+    # init; the mod range only states the minimum release line, never API compatibility.
     versionRange = "${csc_version_range}"
     ordering = "AFTER"
     side = "BOTH"

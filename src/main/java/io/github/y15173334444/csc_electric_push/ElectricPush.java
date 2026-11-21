@@ -3,6 +3,7 @@ package io.github.y15173334444.csc_electric_push;
 import io.github.y15173334444.csc_electric_push.block.ElectricPushBlock;
 import io.github.y15173334444.csc_electric_push.block.ElectricPushBlockEntity;
 import io.github.y15173334444.csc_electric_push.node.ElectricPushNodes;
+import io.github.y15173334444.create_schematic_compute.api.ApiVersion;
 import io.github.y15173334444.create_schematic_compute.api.CustomNodes;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
@@ -58,6 +59,16 @@ public final class ElectricPush {
             .build());
 
     public ElectricPush(IEventBus modEventBus) {
+        // API 版本门：兼容性按 API 自己的版本号判别（ApiVersion 单源，与模组版本解耦）。
+        // 本附属使用宿主套件面（HostGraphs 一族）= API 0.2.0。
+        // The API version gate: compatibility is indexed by the API's own version
+        // (ApiVersion is the single source, decoupled from the mod version). This addon
+        // uses the host-suite surface (the HostGraphs family) = API 0.2.0.
+        if (!ApiVersion.CURRENT.isAtLeast(0, 2, 0)) {
+            throw new IllegalStateException(
+                "CSC API 0.2.0 or newer is required, found " + ApiVersion.CURRENT);
+        }
+
         BLOCKS.register(modEventBus);
         ITEMS.register(modEventBus);
         BLOCK_ENTITIES.register(modEventBus);
