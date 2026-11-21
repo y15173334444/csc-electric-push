@@ -100,23 +100,24 @@ thrust and speed-servo semantics are explicitly out of the prototype.
   （javac 看不见 jarjar 嵌套 jar，故 Flywheel/Ponder 同袋）；CSC 本体按兄弟目录
   `build/libs` 产物编译（缺 jar 时构建期报错并提示先构建主仓）。
 - Create 的原型期用途是扳手（`IWrenchable`）；动力/供电门控留待后续版本。
-- **图宿主走 CSC 内部面**（`SyncedGraphBlockEntity`/`GraphHost`/`AbstractGraphScreen`/
-  `BlueprintTogglePacket`）——公开宿主套件（波 2）落地后迁移。**名单键借用过渡**（可否决）：
-  电推自持图的 `hostKey` 借用蓝图机的键；键在 CSC 里只是名单命名空间（客户端菜单过滤 +
-  服务端准入门两处消费，不进存档 NBT），第三方宿主键今天登记不进名单（登记口只放行
-  蓝图机，波 2 宿主套件才让宿主自声明可登记键）。波 2 声明口落地后换正式键。
+- **图宿主已迁公开宿主套件**（2026-11-21，CSC 波 2 落地）：BE 构造期 `HostGraphs.bind`
+  拿引擎柄（声明面 `HostGraphType`，缝面空——偏差全化声明），tick/生命周期/NBT 各一行
+  转发；右键开图走 `HostGraphs.openEditor` 泛用屏（自屏删除）。**名单键自声明**（过渡口径
+  已销）：自持图键 = `csc_electric_push:electric_push`，bind 即声明，自持图名单走归属
+  两路放行的「自声明键同命名空间」路；蓝图机名单登记保留（CSC 白名单键，第①路）。
 
 All three mods are mandatory in mods.toml; the compile wiring reuses the shape the main repo
 already validates (Create from Modrinth Maven, Sable via the `libs/` quartet because javac
 cannot see jarjar-nested jars, CSC from the sibling build output with a build-time existence
 check). Create's prototype-stage role is the wrench; power/energy gating is deferred.
-The graph host rides CSC internal surface (`SyncedGraphBlockEntity`/`GraphHost`/
-`AbstractGraphScreen`/`BlueprintTogglePacket`) — migrate once the public host suite
-(wave 2) lands. **Roster-key borrow, transitional** (vetoable): the self-hosted graph's
-`hostKey` borrows the blueprint computer's key; the key is only a roster namespace in CSC
-(client menu filter + server admission gate; never saved to NBT), and third-party host keys
-cannot yet enrol (the enrolment point admits only the blueprint key; the wave-2 host suite
-lets hosts declare enrolable keys). Swap to a proper key when that lands.
+The graph host rides the public host suite (migrated 2026-11-21, CSC wave 2): the BE
+binds at construction (`HostGraphs.bind`, declarations in `HostGraphType`, an empty seam
+face - the deviations all became declarations) and forwards tick/lifecycle/NBT one line
+each; right-click opens the editor via `HostGraphs.openEditor`'s generic screen (the own
+screen is deleted). **Roster key self-declared** (the transitional borrow is retired):
+the self-graph key is `csc_electric_push:electric_push`, declared by bind, and the
+self-graph roster rides the "self-declared key, same namespace" path of the two-path
+ownership; the blueprint-roster enrolment stays (a CSC allowlist key, path 1).
 
 ## 5. 原型边界 / Prototype boundaries
 
