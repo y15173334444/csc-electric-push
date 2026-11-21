@@ -28,12 +28,14 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 /**
- * 电推原型方块：Sable 子级推进器的机械面。推力方向 = {@link #FACING}（六向，放置朝向
- * 为点击面）；{@link #ACTIVE} 亮灭是「图上正给推进比例」的视觉回执。比例本身没有
- * 方块 GUI——唯一控制面是 CSC 节点图（单回路口径），红石邻接信号只是启停门。
- * 扳手旋转走 {@code IWrenchable} 默认转序；潜行扳手收回保留 NBT。
+ * 电推原型方块：Sable 子级推进器的机械面。喷口（排气面）朝向 = {@link #FACING}（六向，
+ * 放置朝向为点击面），推力沿其反向（火箭式：喷口向后、机体向前）；{@link #ACTIVE} 亮灭
+ * 是「图上正给推进比例」的视觉回执。比例本身没有方块 GUI——唯一控制面是 CSC 节点图
+ * （单回路口径），红石邻接信号只是启停门。扳手旋转走 {@code IWrenchable} 默认转序；
+ * 潜行扳手收回保留 NBT。
  * <p>The prototype actuator block - the mechanical face of the Sable sub-level thruster.
- * Thrust runs along {@link #FACING} (six-way; placement faces the clicked face);
+ * The nozzle (exhaust face) runs along {@link #FACING} (six-way; placement faces the
+ * clicked face) and thrust runs opposite (rocket-style: nozzle aft, body forward);
  * {@link #ACTIVE} is the visual receipt that a graph is currently commanding the ratio.
  * The ratio has no block GUI - the CSC node graph is its only control surface
  * (single-loop design); a neighbouring redstone signal is just the enable gate.

@@ -60,21 +60,27 @@ point force in `sable$physicsTick`: the actuator's own "electric push thrust" fo
 (a local `ForceGroup` instance — Sable's built-in group constants are Veil's
 `RegistryObject` type, outside javac's reach, while the `ForceGroup` record itself is
 pure), applied at the block's centre (plot-local coordinates), with the vector
-`facing × MAX_THRUST × ratio × timeStep`. Multiplying by `timeStep` keeps the
+`facing.opposite × MAX_THRUST × ratio × timeStep` (FACING is the nozzle/exhaust
+direction - the front texture's ring port - so thrust runs opposite, rocket-style;
+live-verdicted 2026-11-21: pushing along FACING shoved the craft toward the nozzle
+face). Multiplying by `timeStep` keeps the
 per-game-tick impulse independent of the substep count (the exact cadence of Sable's own
 propeller). Force groups reset at substep start and settle
 into one impulse at substep end; sleeping bodies wake when the total changes.
 
 ### 2.3 方块行为 / Block behaviour
 
-- `FACING` 六向即推力方向；放置朝向为点击面；Create 扳手按点击面轴向旋转（
+- `FACING` 六向即喷口（排气面）朝向，推力沿其反向（火箭式：喷口向后、机体向前，
+  2026-11-21 实机改判）；放置朝向为点击面；Create 扳手按点击面轴向旋转（
   `IWrenchable` 默认转序）；潜行扳手收回保留 NBT（比例随物品走）。
 - 右键打开自持图编辑器（CSC 方块惯例；SpeedProxy 同款 Screen 接线）。
 - `ACTIVE` 亮灭反映「比例 > 0」——图上正给出比例时的视觉回执。
 - 红石邻接信号是启停门（红石=兜底控制通道的口径）。
 - 镐挖/爆炸掉落纯物品是设计意图（NBT 只随扳手收回保留）。
 
-`FACING` (six-way) is the thrust direction; placement faces the clicked face; the Create
+`FACING` (six-way) is the nozzle (exhaust-face) direction and thrust runs opposite
+(rocket-style: nozzle aft, body forward; live-reversed 2026-11-21); placement faces the
+clicked face; the Create
 wrench rotates it around the clicked face's axis (`IWrenchable`'s default rotation order);
 sneak-wrench pickup keeps the NBT (the ratio rides the item). Right-click opens the
 self-hosted graph editor (the CSC block convention; the SpeedProxy screen wiring).

@@ -46,7 +46,8 @@ import org.joml.Vector3d;
  * host itself); the same node in a blueprint graph still writes remotely by {@code pos}.
  * Execution plane: {@link BlockEntitySubLevelActor} queues a point force per physics
  * substep - the actuator's own "electric push thrust" force group, applied at the block
- * centre (plot-local), {@code facing × MAX_THRUST × ratio × timeStep} (frame-rate
+ * centre (plot-local), {@code facing.opposite × MAX_THRUST × ratio × timeStep} (FACING
+ * is the nozzle/exhaust direction, thrust runs opposite - rocket-style; frame-rate
  * independent, the cadence of Sable's own propeller). The host rides the public host
  * suite (wave 2, migrated): the engine handle comes from {@code HostGraphs.bind} at
  * construction, tick/lifecycle/NBT forward one line each, and the editor opens through
@@ -140,8 +141,13 @@ public class ElectricPushBlockEntity extends BlockEntity
         Level level = getLevel();
         if (level != null && level.hasNeighborSignal(worldPosition)) return;
 
+        // FACING = 喷口（排气面，正面贴图环形喷口）朝向——推力沿反向（火箭式：喷口向后、
+        // 机体向前）。实机判定 2026-11-21：沿 FACING 直推把机体往喷口面推，方向反了。
+        // FACING is the nozzle (exhaust) direction - the front texture's ring port -
+        // so thrust runs opposite (rocket-style: nozzle aft, body forward). Live verdict
+        // 2026-11-21: pushing along FACING shoved the craft toward the nozzle face.
         Direction facing = getBlockState().getValue(ElectricPushBlock.FACING);
-        Vec3 dir = Vec3.atLowerCornerOf(facing.getNormal());
+        Vec3 dir = Vec3.atLowerCornerOf(facing.getOpposite().getNormal());
         Vector3d impulse = new Vector3d(dir.x, dir.y, dir.z).mul(MAX_THRUST * pushRatio * timeStep);
         QueuedForceGroup forceGroup = subLevel.getOrCreateQueuedForceGroup(THRUST_GROUP);
         forceGroup.applyAndRecordPointForce(JOMLConversion.atCenterOf(worldPosition), impulse);
