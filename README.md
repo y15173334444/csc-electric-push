@@ -23,8 +23,8 @@ Design note (mechanism level): [docs/electric-push-design.md](docs/electric-push
 
 | 仓库 / Repo | 路径 / Path | 关系 / Relation |
 |---|---|---|
-| 主仓 Create: Schematic Compute | `../create-schematic-compute` | 本体 + 公开 API（本仓的编译契约面）/ the body plus the public API (this repo's compile contract) |
-| CSC Example Addon | `../csc-example-addon` | 公开 API 示例模组的独立仓（原主仓 `tools/example-addon/`）；主仓第一方附属的动力类（舵机 / 周期变距）形态在其 README 的路线节登记、尚未动工 / the standalone repo of the public-API example addon (formerly the main repo's `tools/example-addon/`); the main repo's power-class first-party addon (servo / cyclic pitch) is noted in its roadmap, not yet in progress |
+| 主仓 Create: Schematic Compute | `../create-schematic-compute` · [GitHub](https://github.com/y15173334444/create-schematic-compute) | 本体 + 公开 API（本仓的编译契约面）/ the body plus the public API (this repo's compile contract) |
+| CSC Example Addon | `../csc-example-addon` · [GitHub](https://github.com/y15173334444/csc-example-addon) | 公开 API 示例模组的独立仓（原主仓 `tools/example-addon/`）；主仓第一方附属的动力类（舵机 / 周期变距）形态在其 README 的路线节登记、尚未动工 / the standalone repo of the public-API example addon (formerly the main repo's `tools/example-addon/`); the main repo's power-class first-party addon (servo / cyclic pitch) is noted in its roadmap, not yet in progress |
 
 ## 依赖 / Dependencies
 
